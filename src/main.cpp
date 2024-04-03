@@ -383,9 +383,9 @@ public:
 
         // thx adaf for telling me where these are
         auto engine = FMODAudioEngine::sharedEngine();
-        //glUniform1f(m_uniformPulse1, engine->m_pulse1);
-        //glUniform1f(m_uniformPulse2, engine->m_pulse2);
-        //glUniform1f(m_uniformPulse3, engine->m_pulse3);
+        glUniform1f(m_uniformPulse1, engine->m_pulse1);
+        glUniform1f(m_uniformPulse2, engine->m_pulse2);
+        glUniform1f(m_uniformPulse3, engine->m_pulse3);
 
         glUniform1fv(m_uniformFft, FFT_ACTUAL_SPECTRUM_SIZE, m_spectrum);
 
