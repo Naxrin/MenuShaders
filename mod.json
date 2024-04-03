@@ -1,7 +1,7 @@
 {
-    "geode": "2.0.0-beta.12",
-    "gd": "2.204",
-    "version": "v1.1.0",
+    "geode": "2.0.0-beta.23",
+    "gd": {"win":"2.204", "mac":"2.200"}
+    "version": "v1.2.0",
     "id": "cgytrus.menu-shaders",
     "name": "Menu Shaders",
     "developer": "mat & ConfiG & Naxrin",
@@ -9,7 +9,7 @@
     "repository": "https://github.com/cgytrus/MenuShaders",
     "issues": {
         "info": "Report any issues you have on GitHub issues.",
-        "url": "https://github.com/cgytrus/MenuShaders/issues"
+        "url": "https://github.com/Naxrin/MenuShaders/issues"
     },
     "tags": [ "Customization" ],
     "resources": {
