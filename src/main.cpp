@@ -199,7 +199,7 @@ public:
             log::error("{}", res.unwrapErr());
             return false;
         }
-        log::info(res.unwrap());
+        //log::info(res.unwrap());
 
         glBindAttribLocation(m_shader.program, 0, "aPosition");
 
@@ -208,7 +208,7 @@ public:
             log::error("{}", res.unwrapErr());
             return false;
         }
-        log::info(res.unwrap());
+        //log::info(res.unwrap());
 
         ccGLUseProgram(m_shader.program);
 
@@ -255,7 +255,7 @@ public:
             }
         }
 
-        GameSoundManager::get()->enableMetering();
+        //GameSoundManager::get()->enableMetering();
 
         // TODO: add back when geode android will link to fmod
 #ifndef GEODE_IS_ANDROID
@@ -383,9 +383,9 @@ public:
 
         // thx adaf for telling me where these are
         auto engine = FMODAudioEngine::sharedEngine();
-        glUniform1f(m_uniformPulse1, engine->m_pulse1);
-        glUniform1f(m_uniformPulse2, engine->m_pulse2);
-        glUniform1f(m_uniformPulse3, engine->m_pulse3);
+        //glUniform1f(m_uniformPulse1, engine->m_pulse1);
+        //glUniform1f(m_uniformPulse2, engine->m_pulse2);
+        //glUniform1f(m_uniformPulse3, engine->m_pulse3);
 
         glUniform1fv(m_uniformFft, FFT_ACTUAL_SPECTRUM_SIZE, m_spectrum);
 
@@ -498,6 +498,7 @@ class $modify(MenuLayer) {
     }
 };
 
+
 #include <Geode/modify/LevelSelectLayer.hpp>
 class $modify(LevelSelectLayer) {
     bool init(int lvl) {
@@ -527,6 +528,22 @@ class $modify(CreatorLayer) {
         for (const auto& child : CCArrayExt<CCNode*>(this->getChildren())) {
             auto sprite = typeinfo_cast<CCSprite*>(child);
             if (sprite && (sprite->getZOrder() == -1 || sprite->getZOrder() == 1))
+                sprite->setVisible(false);
+        }
+        return true;
+    }
+};
+
+#include <Geode/modify/GJGarageLayer.hpp>
+class $modify(GJGarageLayer) {
+    bool init() {
+        if (!GJGarageLayer::init())
+            return false;
+        if (!ShaderNode::tryAddToNode(this, "garage", -2))
+            return true;
+        for (const auto& child : CCArrayExt<CCNode*>(this->getChildren())) {
+            auto sprite = typeinfo_cast<CCSprite*>(child);
+            if (sprite && (sprite->getZOrder() < 0 || sprite->getZOrder() == 1))
                 sprite->setVisible(false);
         }
         return true;
@@ -567,8 +584,8 @@ class $modify(EditLevelLayer) {
 
 #include <Geode/modify/LevelInfoLayer.hpp>
 class $modify(LevelInfoLayer) {
-    bool init(GJGameLevel* level) {
-        if (!LevelInfoLayer::init(level))
+    bool init(GJGameLevel* level, bool p1) {
+        if (!LevelInfoLayer::init(level, p1))
             return false;
         if (!ShaderNode::tryAddToNode(this, "play-level", -2))
             return true;
@@ -579,10 +596,62 @@ class $modify(LevelInfoLayer) {
     }
 };
 
+#include <Geode/modify/LevelListLayer.hpp>
+class $modify(LevelListLayer) {
+    bool init(GJLevelList* level) {
+        if (!LevelListLayer::init(level))
+            return false;
+        if (!ShaderNode::tryAddToNode(this, "level-list", -2))
+            return true;
+        static_cast<CCNode *>(this->getChildren()->objectAtIndex(5))->setVisible(false);
+        static_cast<CCNode *>(this->getChildren()->objectAtIndex(6))->setVisible(false);
+        return true;
+    }
+};
+
+#include <Geode/modify/LeaderboardsLayer.hpp>
+class $modify(LeaderboardsLayer) {
+    bool init(LeaderboardState p) {
+        if (!LeaderboardsLayer::init(p))
+            return false;
+        if (!ShaderNode::tryAddToNode(this, "leaderboard", -2))
+            return true;
+        this->getChildByID("bottom-left-art")->setVisible(false);
+        this->getChildByID("bottom-right-art")->setVisible(false);
+        return true;
+    }
+};
+
+#include <Geode/modify/GauntletSelectLayer.hpp>
+class $modify(GauntletSelectLayer) {
+    bool init(int p) {
+        if (!GauntletSelectLayer::init(p))
+            return false;
+        if (!ShaderNode::tryAddToNode(this, "gauntlet-select", -2))
+            return true;
+        static_cast<CCSprite *>(this->getChildren()->objectAtIndex(3))->setVisible(false);
+        static_cast<CCSprite *>(this->getChildren()->objectAtIndex(4))->setVisible(false);
+        static_cast<CCSprite *>(this->getChildren()->objectAtIndex(5))->setVisible(false);
+        static_cast<CCSprite *>(this->getChildren()->objectAtIndex(6))->setVisible(false);
+        return true;
+    }
+};
+
+#include <Geode/modify/GauntletLayer.hpp>
+class $modify(GauntletLayer) {
+    bool init(GauntletType p) {
+        if (!GauntletLayer::init(p))
+            return false;
+        if (!ShaderNode::tryAddToNode(this, "gauntlet-map", -1))
+            return true;
+        return true;
+    }
+};
+
 #include <Geode/modify/LevelSearchLayer.hpp>
 class $modify(LevelSearchLayer) {
-    bool init() {
-        if (!LevelSearchLayer::init())
+    bool init(int p0) {
+        if (!LevelSearchLayer::init(p0))
             return false;
         if (!ShaderNode::tryAddToNode(this, "search", -3))
             return true;
