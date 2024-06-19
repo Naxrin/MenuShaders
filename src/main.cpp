@@ -427,14 +427,14 @@ public:
 
     static Result<ShaderNode*> createWithMenuName(const std::string& name) {
         std::filesystem::path vertexPath =
-            (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename(Mod::get()->expandSpriteName((name + "-vert.glsl").c_str()), false);
+            (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename((name + "-vert.glsl"_spr).c_str(), false);
         if (!std::filesystem::exists(vertexPath)) {
             vertexPath =
                 (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename("any-vert.glsl"_spr, false);
         }
 
         std::filesystem::path fragmentPath =
-            (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename(Mod::get()->expandSpriteName((name + "-frag.glsl").c_str()), false);
+            (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename((name + "-frag.glsl"_spr).c_str(), false);
         if (!std::filesystem::exists(fragmentPath)) {
             fragmentPath =
                 (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename("menu-shader.fsh", false);
