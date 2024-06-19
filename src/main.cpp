@@ -1,8 +1,6 @@
 #include <Geode/Geode.hpp>
-
-#include <ghc/filesystem.hpp>
-
-#include <ctre.hpp>
+//#include <stdio.hpp>
+#include <regex>
 
 using namespace geode::prelude;
 
@@ -22,23 +20,24 @@ struct Shader {
         std::string vertexSource,
         std::string fragmentSource
     ) {
+        std::smatch match;
         vertexSource = utils::string::trim(vertexSource);
-        if (auto match = ctre::multiline_search<"^#version [0-9]+( core| compatibility|)$">(vertexSource)) {
-            vertexSource.erase(match.get<0>().begin(), match.get<0>().end());
+        if (std::regex_search(vertexSource, match, std::regex("^#version [0-9]+( core| compatibility|)$"))) {
+            vertexSource.erase(match.str().begin(), match.str().end());
             log::warn("For shader developers: #version is unsupported! Always forced to 120 on Windows and undefined on macOS and mobile.");
         }
-        if (auto match = ctre::multiline_search<"precision [a-zA-Z]+ [a-zA-Z]+;">(vertexSource)) {
-            vertexSource.erase(match.get<0>().begin(), match.get<0>().end());
+        if (std::regex_search(vertexSource, match, std::regex("precision [a-zA-Z]+ [a-zA-Z]+;"))) {
+            vertexSource.erase(match.str().begin(), match.str().end());
             log::warn("For shader developers: precision is unsupported! Always forced to undefined on desktop and highp on mobile.");
         }
 
         fragmentSource = utils::string::trim(fragmentSource);
-        if (auto match = ctre::multiline_search<"^#version [0-9]+( core| compatibility|)$">(fragmentSource)) {
-            fragmentSource.erase(match.get<0>().begin(), match.get<0>().end());
+        if (std::regex_search(fragmentSource, match, std::regex("^#version [0-9]+( core| compatibility|)$"))) {
+            fragmentSource.erase(match.str().begin(), match.str().end());
             log::warn("For shader developers: #version is unsupported! Always forced to 120 on Windows and undefined on macOS and mobile.");
         }
-        if (auto match = ctre::multiline_search<"precision [a-zA-Z]+ [a-zA-Z]+;">(fragmentSource)) {
-            fragmentSource.erase(match.get<0>().begin(), match.get<0>().end());
+        if (std::regex_search(fragmentSource, match, std::regex("precision [a-zA-Z]+ [a-zA-Z]+;"))) {
+            fragmentSource.erase(match.str().begin(), match.str().end());
             log::warn("For shader developers: precision is unsupported! Always forced to undefined on desktop and highp on mobile.");
         }
 
@@ -383,9 +382,9 @@ public:
 
         // thx adaf for telling me where these are
         auto engine = FMODAudioEngine::sharedEngine();
-        glUniform1f(m_uniformPulse1, engine->m_pulse1);
-        glUniform1f(m_uniformPulse2, engine->m_pulse2);
-        glUniform1f(m_uniformPulse3, engine->m_pulse3);
+        //glUniform1f(m_uniformPulse1, engine->m_pulse1);
+        //glUniform1f(m_uniformPulse2, engine->m_pulse2);
+        //glUniform1f(m_uniformPulse3, engine->m_pulse3);
 
         glUniform1fv(m_uniformFft, FFT_ACTUAL_SPECTRUM_SIZE, m_spectrum);
 
@@ -427,20 +426,20 @@ public:
     }
 
     static Result<ShaderNode*> createWithMenuName(const std::string& name) {
-        ghc::filesystem::path vertexPath =
+        std::filesystem::path vertexPath =
             (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename(Mod::get()->expandSpriteName((name + "-vert.glsl").c_str()), false);
-        if (!ghc::filesystem::exists(vertexPath)) {
+        if (!std::filesystem::exists(vertexPath)) {
             vertexPath =
                 (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename("any-vert.glsl"_spr, false);
         }
 
-        ghc::filesystem::path fragmentPath =
+        std::filesystem::path fragmentPath =
             (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename(Mod::get()->expandSpriteName((name + "-frag.glsl").c_str()), false);
-        if (!ghc::filesystem::exists(fragmentPath)) {
+        if (!std::filesystem::exists(fragmentPath)) {
             fragmentPath =
                 (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename("menu-shader.fsh", false);
         }
-        if (!ghc::filesystem::exists(fragmentPath)) {
+        if (!std::filesystem::exists(fragmentPath)) {
             fragmentPath =
                 (std::string)CCFileUtils::sharedFileUtils()->fullPathForFilename("any-frag.glsl"_spr, false);
         }
@@ -485,6 +484,7 @@ class $modify(MenuLayer) {
     bool init() {
         if (!MenuLayer::init())
             return false;
+
         if (!ShaderNode::tryAddToNode(this, "main", -10))
             return true;
         for (const auto& child : CCArrayExt<CCNode*>(this->getChildren())) {
@@ -504,6 +504,9 @@ class $modify(LevelSelectLayer) {
     bool init(int lvl) {
         if (!LevelSelectLayer::init(lvl))
             return false;
+
+        auto sprite = CCScale9Sprite::create("noper.png");
+        this->addChild(sprite);
         if (!ShaderNode::tryAddToNode(this, "level-select", -2))
             return true;
         for (const auto& child : CCArrayExt<CCNode*>(this->getChildren())) {
